@@ -1,4 +1,4 @@
-## NDS Practice Challenge
+## NDS - Desafio Prático
 
 #### Requisitos Gerais
 1. Utilizar Laravel 8. [Instalação Laravel](https://laravel.com/docs/8.x/installation#installation-via-composer)
