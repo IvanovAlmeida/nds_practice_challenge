@@ -2,7 +2,7 @@
 
 #### Requisitos Gerais
 1. Utilizar Laravel 8. [Instalação Laravel](https://laravel.com/docs/8.x/installation#installation-via-composer)
-2. Utilizar Migrations para criar as tabelas no banco e utilizar o timestamps. [Doc Laravel sobre Migrations](https://laravel.com/docs/8.x/migrations#introduction)
+2. Utilizar Migrations para criar as tabelas no banco e utilizar o timestamps e softDeletes. [Doc Laravel sobre Migrations](https://laravel.com/docs/8.x/migrations#introduction)
 3. O backend será uma API Rest.
 4. O frontend utilizará o React.
 
