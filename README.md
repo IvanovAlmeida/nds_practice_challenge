@@ -19,5 +19,5 @@
 - [ ] Utilizar injeção de dependencia para entregar os objetos aos controllers.
 - [ ] O repository deve realizar apenas as chamadas ao banco como consultas, inserções e atualizações.
 
-#### 3º Etapa - Refatorar para uso de Services e Interfaces
+#### 3º Etapa - Refatorar para uso de Services, Interfaces e UnitOfWork
 - [ ] A definir
