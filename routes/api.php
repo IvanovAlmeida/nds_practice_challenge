@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UsuariosController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('usuarios')->group(function() {
+    Route::get('/', [ UsuariosController::class, 'buscar' ]);
+    Route::post('/', [ UsuariosController::class, 'inserir' ]);
+    Route::get('/{id:int}', [ UsuariosController::class, 'visualizar' ]);
 });
