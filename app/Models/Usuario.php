@@ -4,8 +4,8 @@ namespace App\Models;
 
 use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Date;
 
 /**
  * Class Usuario
@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Date;
  * @property DateTime $created_at
  * @property DateTime $updated_at
  * @property DateTime $deleted_at
+ * @method static Usuario find(int $id)
  */
 class Usuario extends Authenticatable
 {

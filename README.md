@@ -9,10 +9,11 @@
 #### [1º Etapa](https://github.com/IvanovAlmeida/nds_practice_challenge/tree/etapa_1)
 - [X] Cadastrar usuário (incluindo senha e armazenar como hash. [Doc Laravel sobre Hash](https://laravel.com/docs/8.x/hashing))
     - [X] Usuário deve ter os atributos: nome(min: 2 caracteres, max: 80 caracteres), senha(min: 6 caracteres), email(validar se email) e data de nascimento(obrigatório).
-- [ ] Alterar usuário (exeto a senha)
-- [ ] Alterar senha do usuário
+- [X] Alterar usuário (exeto a senha)
+- [X] Alterar senha do usuário
 - [X] Visualizar usuário (obter suas informações - exceto senha)
-- [ ] Implementar validações para os campos recebidos nas requisições antes de inserir ou alterar o registro. [Doc Laravel sobre validação](https://laravel.com/docs/8.x/validation#quick-writing-the-validation-logic)
+- [X] Implementar validações para os campos recebidos nas requisições antes de inserir ou alterar o registro. [Doc Laravel sobre validação](https://laravel.com/docs/8.x/validation#quick-writing-the-validation-logic)
+- [ ] Implementar no frontend
 
 #### 2º Etapa - Refatorar para uso do padrão Repository e DI.
 - [ ] Remover as chamadas das model direto dos controllers e utilizar o padrão Repository.

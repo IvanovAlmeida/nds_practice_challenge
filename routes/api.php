@@ -19,4 +19,6 @@ Route::prefix('usuarios')->group(function() {
     Route::get('/', [ UsuariosController::class, 'buscar' ]);
     Route::post('/', [ UsuariosController::class, 'inserir' ]);
     Route::get('/{id:int}', [ UsuariosController::class, 'visualizar' ]);
+    Route::put('/{id:int}', [ UsuariosController::class, 'editar' ]);
+    Route::patch('/alterar-senha/{id:int}', [ UsuariosController::class, 'alterarSenha' ]);
 });
