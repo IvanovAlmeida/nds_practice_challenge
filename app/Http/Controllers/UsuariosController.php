@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use App\Repository\UsuarioRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,16 +13,22 @@ use Illuminate\Validation\Rule;
 
 class UsuariosController extends Controller
 {
-    public function buscar(): JsonResponse
+    private UsuarioRepository $usuarioRepository;
+
+    public function __construct(UsuarioRepository $usuarioRepository)
     {
-        $usuarios = Usuario::all();
+        $this->usuarioRepository = $usuarioRepository;
+    }
+
+    public function buscar(Request $request): JsonResponse
+    {
+        $usuarios = $this->usuarioRepository->buscar($request->query->all());
         return response()->json($usuarios);
     }
 
     public function visualizar(int $id): JsonResponse
     {
-        $usuario = Usuario::find($id);
-
+        $usuario = $this->usuarioRepository->buscarPorId($id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -44,14 +51,14 @@ class UsuariosController extends Controller
         $dados = $request->all();
         $dados["password"] = Hash::make($dados["password"]);
 
-        $usuario = Usuario::create($dados);
+        $usuario = $this->usuarioRepository->inserir($dados);
 
         return response()->json($usuario);
     }
 
     public function editar(Request $request, int $id): JsonResponse
     {
-        $usuario = Usuario::find($id);
+        $usuario = $this->usuarioRepository->buscarPorId($id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -68,11 +75,8 @@ class UsuariosController extends Controller
             return response()->json($validated->getMessageBag(), 400);
         }
 
-        $usuario->nome = $request->nome;
-        $usuario->email = $request->email;
-        $usuario->nascimento = $request->nascimento;
-
-        if(!$usuario->update()) {
+        $dados = $request->all(['nome', 'email', 'nascimento']);
+        if(!$this->usuarioRepository->atualizar($id, $dados)) {
             return response()->json(["erro" => "Não foi possível alterar usuário!"], 500);
         }
 
@@ -81,7 +85,7 @@ class UsuariosController extends Controller
 
     public function alterarSenha(Request $request, int $id): JsonResponse
     {
-        $usuario = Usuario::find($id);
+        $usuario = $this->usuarioRepository->buscarPorId($id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -93,12 +97,31 @@ class UsuariosController extends Controller
             return response()->json($validated->getMessageBag(), 400);
         }
 
-        $usuario->password = Hash::make($request->password);
-
-        if(!$usuario->update()) {
+        $password = Hash::make($request->password);
+        if(!$this->usuarioRepository->atualizar($id, ['password' => $password])) {
             return response()->json(["erro" => "Não foi possível alterar senha do usuário!"], 500);
         }
 
         return response()->json(["msg" => "Senha alterada com sucesso!"]);
+    }
+
+    public function desativar(int $id): JsonResponse
+    {
+        $usuario = $this->usuarioRepository->buscarPorId($id);
+        if($usuario == null)
+            return response()->json(["erro" => "not found"], 404);
+
+        $this->usuarioRepository->desativar($id);
+        return response()->json(["msg" => "Usuário desativado com sucesso!"]);
+    }
+
+    public function reativar(int $id): JsonResponse
+    {
+        $usuario = $this->usuarioRepository->buscarPorId($id);
+        if($usuario == null)
+            return response()->json(["erro" => "not found"], 404);
+
+        $this->usuarioRepository->reativar($id);
+        return response()->json(["msg" => "Usuário reativado com sucesso!"]);
     }
 }

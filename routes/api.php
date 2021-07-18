@@ -21,4 +21,6 @@ Route::prefix('usuarios')->group(function() {
     Route::get('/{id:int}', [ UsuariosController::class, 'visualizar' ]);
     Route::put('/{id:int}', [ UsuariosController::class, 'editar' ]);
     Route::patch('/alterar-senha/{id:int}', [ UsuariosController::class, 'alterarSenha' ]);
+    Route::delete('/{id:int}', [ UsuariosController::class, 'desativar' ]);
+    Route::patch('/reativar/{id:int}', [ UsuariosController::class, 'reativar' ]);
 });

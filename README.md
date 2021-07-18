@@ -16,9 +16,9 @@
 - [ ] Implementar no frontend
 
 #### 2º Etapa - Refatorar para uso do padrão Repository e DI.
-- [ ] Remover as chamadas das model direto dos controllers e utilizar o padrão Repository.
-- [ ] Utilizar injeção de dependencia para entregar os objetos aos controllers.
-- [ ] O repository deve realizar apenas as chamadas ao banco como consultas, inserções e atualizações.
+- [X] Remover as chamadas das model direto dos controllers e utilizar o padrão Repository.
+- [X] Utilizar injeção de dependencia para entregar os objetos aos controllers.
+- [X] O repository deve realizar apenas as chamadas ao banco como consultas, inserções e atualizações.
 
 #### 3º Etapa - Refatorar para uso de Services, Interfaces e UnitOfWork
 - [ ] A definir
