@@ -5,6 +5,7 @@ namespace App\Models;
 use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -56,4 +57,12 @@ class Usuario extends Authenticatable
         'nascimento' => 'datetime', 'created_at' => 'datetime',
         'updated_at' => 'datetime', 'deleted_at' => 'datetime',
     ];
+
+    /**
+     * @return HasMany
+     */
+    public function itens(): HasMany
+    {
+        return $this->hasMany(Item::class);
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ItensController;
 use App\Http\Controllers\UsuariosController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,4 +24,10 @@ Route::prefix('usuarios')->group(function() {
     Route::patch('/alterar-senha/{id:int}', [ UsuariosController::class, 'alterarSenha' ]);
     Route::delete('/{id:int}', [ UsuariosController::class, 'desativar' ]);
     Route::patch('/reativar/{id:int}', [ UsuariosController::class, 'reativar' ]);
+});
+
+Route::prefix('itens')->group(function() {
+    Route::get('/', [ ItensController::class, 'buscar' ]);
+    Route::get('/{id:int}', [ ItensController::class, 'visualizar' ]);
+    Route::post('/', [ ItensController::class, 'inserir' ]);
 });
