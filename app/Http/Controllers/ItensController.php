@@ -47,15 +47,18 @@ class ItensController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'nome' => 'required|min:2|max:25',
-            'valor' => 'required',
-            'usuario_id' => 'required|exists:usuarios,id'
+            'valor' => 'required'
         ]);
 
         if($validated->fails()) {
             return response()->json($validated->getMessageBag(), 400);
         }
 
-        $dados = $request->all(['nome', 'valor', 'usuario_id']);
+        $dados = $request->all(['nome', 'valor']);
+
+        $usuario = auth()->user();
+        $dados['usuario_id'] = $usuario->id;
+
         $item = $this->itemRepository->inserir($dados);
 
         return response()->json($item);
@@ -68,7 +71,7 @@ class ItensController extends Controller
      */
     public function editar(Request $request, int $id): JsonResponse
     {
-        $item = $this->itemRepository->buscarPorId($id);
+        $item = $this->itemRepository->buscarPorIdEUsuario($id, auth()->user()->id);
         if($item == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -96,7 +99,7 @@ class ItensController extends Controller
      */
     public function desativar(int $id): JsonResponse
     {
-        $item = $this->itemRepository->buscarPorId($id);
+        $item = $this->itemRepository->buscarPorIdEUsuario($id, auth()->user()->id);
         if($item == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -110,7 +113,7 @@ class ItensController extends Controller
      */
     public function reativar(int $id): JsonResponse
     {
-        $item = $this->itemRepository->buscarPorId($id);
+        $item = $this->itemRepository->buscarPorIdEUsuario($id, auth()->user()->id);
         if($item == null)
             return response()->json(["erro" => "not found"], 404);
 

@@ -56,9 +56,9 @@ class UsuariosController extends Controller
         return response()->json($usuario);
     }
 
-    public function editar(Request $request, int $id): JsonResponse
+    public function editar(Request $request): JsonResponse
     {
-        $usuario = $this->usuarioRepository->buscarPorId($id);
+        $usuario = $this->usuarioRepository->buscarPorId(auth()->user()->id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -76,7 +76,7 @@ class UsuariosController extends Controller
         }
 
         $dados = $request->all(['nome', 'email', 'nascimento']);
-        if(!$this->usuarioRepository->atualizar($id, $dados)) {
+        if(!$this->usuarioRepository->atualizar($usuario->id, $dados)) {
             return response()->json(["erro" => "Não foi possível alterar usuário!"], 500);
         }
 
@@ -84,22 +84,27 @@ class UsuariosController extends Controller
         return response()->json($usuario);
     }
 
-    public function alterarSenha(Request $request, int $id): JsonResponse
+    public function alterarSenha(Request $request): JsonResponse
     {
-        $usuario = $this->usuarioRepository->buscarPorId($id);
+        $usuario = $this->usuarioRepository->buscarPorId(auth()->user()->id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
         $validated = Validator::make($request->all(), [
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'newPassword' => 'required|min:6'
         ]);
 
         if($validated->fails()) {
             return response()->json($validated->getMessageBag(), 400);
         }
 
-        $password = Hash::make($request->password);
-        if(!$this->usuarioRepository->atualizar($id, ['password' => $password])) {
+        if(!Hash::check($request->password, $usuario->password)) {
+            return response()->json(['msg' => 'Senha incorreta!'], 403);
+        }
+
+        $password = Hash::make($request->newPassword);
+        if(!$this->usuarioRepository->atualizar($usuario->id, ['password' => $password])) {
             return response()->json(["erro" => "Não foi possível alterar senha do usuário!"], 500);
         }
 

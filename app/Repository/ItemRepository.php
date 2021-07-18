@@ -36,12 +36,23 @@ class ItemRepository
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return Item|null
      */
-    public function buscarPorId($id): ?Item
+    public function buscarPorId(int $id): ?Item
     {
         return Item::withTrashed()->with('usuario')->find($id);
+    }
+
+    /**
+     * @param int $id
+     * @param int $usuario_id
+     * @return Item|null
+     */
+    public function buscarPorIdEUsuario(int $id, int $usuario_id): ?Item
+    {
+        return Item::withTrashed()
+            ->where('id', $id)->where('usuario_id', $usuario_id)->first();
     }
 
     /**
