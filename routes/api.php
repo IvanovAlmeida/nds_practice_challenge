@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ItensController;
 use App\Http\Controllers\UsuariosController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,4 +29,7 @@ Route::prefix('itens')->group(function() {
     Route::get('/', [ ItensController::class, 'buscar' ]);
     Route::get('/{id:int}', [ ItensController::class, 'visualizar' ]);
     Route::post('/', [ ItensController::class, 'inserir' ]);
+    Route::put('/{id:int}', [ ItensController::class, 'editar' ]);
+    Route::delete('/{id:int}', [ ItensController::class, 'desativar' ]);
+    Route::patch('/reativar/{id:int}', [ ItensController::class, 'reativar' ]);
 });

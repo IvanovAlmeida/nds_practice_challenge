@@ -39,7 +39,7 @@ class ItemRepository
      * @param $id
      * @return Item|null
      */
-    public function buscarPorId($id): Item|null
+    public function buscarPorId($id): ?Item
     {
         return Item::withTrashed()->with('usuario')->find($id);
     }
@@ -68,7 +68,7 @@ class ItemRepository
      * @param int $id
      * @return bool|null
      */
-    public function desativar(int $id): bool|null
+    public function desativar(int $id): ?bool
     {
         $item = $this->buscarPorId($id);
         return $item?->trashed();
@@ -78,7 +78,7 @@ class ItemRepository
      * @param int $id
      * @return bool|null
      */
-    public function reativar(int $id): bool|null
+    public function reativar(int $id): ?bool
     {
         $item = $this->buscarPorId($id);
         return $item?->restore();

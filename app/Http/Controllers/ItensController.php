@@ -60,4 +60,61 @@ class ItensController extends Controller
 
         return response()->json($item);
     }
+
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function editar(Request $request, int $id): JsonResponse
+    {
+        $item = $this->itemRepository->buscarPorId($id);
+        if($item == null)
+            return response()->json(["erro" => "not found"], 404);
+
+        $validated = Validator::make($request->all(), [
+            'nome' => 'required|min:2|max:25',
+            'valor' => 'required'
+        ]);
+
+        if($validated->fails()) {
+            return response()->json($validated->getMessageBag(), 400);
+        }
+
+        $dados = $request->all(['nome', 'valor']);
+        if(!$this->itemRepository->atualizar($id, $dados)) {
+            return response()->json(['Não foi possível alterar o item!'], 500);
+        }
+
+        $item->fill($dados);
+        return response()->json($item);
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function desativar(int $id): JsonResponse
+    {
+        $item = $this->itemRepository->buscarPorId($id);
+        if($item == null)
+            return response()->json(["erro" => "not found"], 404);
+
+        $this->itemRepository->desativar($id);
+        return response()->json(["msg" => "Item desativado com sucesso!"]);
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function reativar(int $id): JsonResponse
+    {
+        $item = $this->itemRepository->buscarPorId($id);
+        if($item == null)
+            return response()->json(["erro" => "not found"], 404);
+
+        $this->itemRepository->reativar($id);
+        return response()->json(["msg" => "Item reativado com sucesso!"]);
+    }
 }

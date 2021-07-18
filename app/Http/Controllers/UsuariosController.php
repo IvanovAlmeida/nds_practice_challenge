@@ -80,6 +80,7 @@ class UsuariosController extends Controller
             return response()->json(["erro" => "Não foi possível alterar usuário!"], 500);
         }
 
+        $usuario->fill($dados);
         return response()->json($usuario);
     }
 

@@ -23,9 +23,9 @@ class UsuarioRepository
         return $query->withTrashed()->get();
     }
 
-    public function buscarPorId($id): Usuario|null
+    public function buscarPorId($id): ?Usuario
     {
-        return Usuario::withTrashed()->find($id);
+        return Usuario::withTrashed()->with('itens')->find($id);
     }
 
     public function inserir(array $dados): Usuario
@@ -39,13 +39,13 @@ class UsuarioRepository
                         ->update($dados);
     }
 
-    public function desativar(int $id): bool|null
+    public function desativar(int $id): ?bool
     {
         $usuario = $this->buscarPorId($id);
         return $usuario?->trashed();
     }
 
-    public function reativar(int $id): bool|null
+    public function reativar(int $id): ?bool
     {
         $usuario = $this->buscarPorId($id);
         return $usuario?->restore();
