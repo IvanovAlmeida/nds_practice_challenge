@@ -25,5 +25,6 @@
 - [X] Implementar autenticação (opcional), usar [jwt](https://jwt-auth.readthedocs.io/en/develop/laravel-installation/)
 
 #### 3º Etapa - Refatorar para uso de Interfaces e Services
-- [ ] Definir as interfaces necessárias(repositories e outras classes).
-- [ ] Definir os services necessários. A logica deve ser removida dos controllers e deve ser responsabilidade dos services.
+- [ ]  Definir as interfaces necessárias(repositories e outras classes).
+- [ ]  Definir os services necessários. A lógica deve ser removida dos controllers e deve ser responsabilidade dos services.
+- [ ]  Os services devem receber os repositories por Injeção de Dependência, assim como devem ser injetados ao controller por meio de DI.
