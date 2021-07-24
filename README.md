@@ -22,15 +22,8 @@
 - [X] Implementar o controller para os Itens com todas as operações (inserir, alterar, listar, desativar e reativar).
     - O item deve ter um nome(min: 2 caracteres, max: 25 caracteres), valor, e deve pertencer a um usuário (cadastrar o id do usuário na tabela do item).
 - [X] No controller de usuário na action de visualizar o usuário trazer os itens também
-- [ ] Implementar autenticação (opcional), usar [jwt](https://jwt-auth.readthedocs.io/en/develop/laravel-installation/)
+- [X] Implementar autenticação (opcional), usar [jwt](https://jwt-auth.readthedocs.io/en/develop/laravel-installation/)
 
-#### 3º Etapa - Refatorar para uso de Interfaces
+#### 3º Etapa - Refatorar para uso de Interfaces e Services
 - [ ] Definir as interfaces necessárias(repositories e outras classes).
-
-#### 4º Etapa - Refatorar para uso de Services
-- [ ] A definir
-
-#### 5º Etapa - ???
-
-#### 6º Etapa - UnitOfWork (Opcional)
-- [ ] A definir
+- [ ] Definir os services necessários. A logica deve ser removida dos controllers e deve ser responsabilidade dos services.
