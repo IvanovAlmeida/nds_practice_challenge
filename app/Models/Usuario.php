@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * Class Usuario
@@ -23,7 +24,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property DateTime $deleted_at
  * @method static Usuario find(int $id)
  */
-class Usuario extends Authenticatable
+class Usuario extends Authenticatable implements JWTSubject
 {
     use HasFactory, SoftDeletes;
 
@@ -64,5 +65,13 @@ class Usuario extends Authenticatable
     public function itens(): HasMany
     {
         return $this->hasMany(Item::class);
+    }
+
+    public function getJWTIdentifier() {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims() {
+        return [];
     }
 }

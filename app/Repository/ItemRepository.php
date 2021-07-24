@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Models\Item;
 use Illuminate\Support\Collection;
 
-class ItemRepository
+class ItemRepository implements IItemRepository
 {
     /**
      * @param array $dados
@@ -42,6 +42,18 @@ class ItemRepository
     public function buscarPorId($id): ?Item
     {
         return Item::withTrashed()->with('usuario')->find($id);
+    }
+
+    /**
+     * @param $id
+     * @param $usuario_id
+     * @return Item|null
+     */
+    public function buscarPorIdEUsuario($id, $usuario_id): ?Item
+    {
+        return Item::withTrashed()
+                ->where('id', $id)
+                ->where('usuario_id', $usuario_id)->first();
     }
 
     /**
@@ -82,5 +94,10 @@ class ItemRepository
     {
         $item = $this->buscarPorId($id);
         return $item?->restore();
+    }
+
+    function test(int $i): bool
+    {
+        // TODO: Implement test() method.
     }
 }

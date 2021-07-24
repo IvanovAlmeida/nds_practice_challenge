@@ -35,30 +35,11 @@ class UsuariosController extends Controller
         return response()->json($usuario);
     }
 
-    public function inserir(Request $request): JsonResponse
+
+
+    public function editar(Request $request): JsonResponse
     {
-        $validated = Validator::make($request->all(), [
-            'nome' => 'required|min:2|max:80|regex:/^[ ]*(.+[ ]+)+.+[ ]*$/i',
-            'email' => 'required|unique:usuarios',
-            'password' => 'required|min:6',
-            'nascimento' => 'required|date'
-        ]);
-
-        if($validated->fails()) {
-            return response()->json($validated->getMessageBag(), 400);
-        }
-
-        $dados = $request->all();
-        $dados["password"] = Hash::make($dados["password"]);
-
-        $usuario = $this->usuarioRepository->inserir($dados);
-
-        return response()->json($usuario);
-    }
-
-    public function editar(Request $request, int $id): JsonResponse
-    {
-        $usuario = $this->usuarioRepository->buscarPorId($id);
+        $usuario = $this->usuarioRepository->buscarPorId(auth()->user()->id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
@@ -75,8 +56,8 @@ class UsuariosController extends Controller
             return response()->json($validated->getMessageBag(), 400);
         }
 
-        $dados = $request->all(['nome', 'email', 'nascimento']);
-        if(!$this->usuarioRepository->atualizar($id, $dados)) {
+        $dados = $request->only(['nome', 'email', 'nascimento']);
+        if(!$this->usuarioRepository->atualizar($usuario->id, $dados)) {
             return response()->json(["erro" => "Não foi possível alterar usuário!"], 500);
         }
 
@@ -84,22 +65,27 @@ class UsuariosController extends Controller
         return response()->json($usuario);
     }
 
-    public function alterarSenha(Request $request, int $id): JsonResponse
+    public function alterarSenha(Request $request): JsonResponse
     {
-        $usuario = $this->usuarioRepository->buscarPorId($id);
+        $usuario = $this->usuarioRepository->buscarPorId(auth()->user()->id);
         if($usuario == null)
             return response()->json(["erro" => "not found"], 404);
 
         $validated = Validator::make($request->all(), [
-            'password' => 'required|min:6'
+            'password' => 'required',
+            'newPassword' => 'required|min:6'
         ]);
 
         if($validated->fails()) {
             return response()->json($validated->getMessageBag(), 400);
         }
 
-        $password = Hash::make($request->password);
-        if(!$this->usuarioRepository->atualizar($id, ['password' => $password])) {
+        if(!Hash::check($request->password, $usuario->password)) {
+            return response()->json(["erro" => "Senha inválida!"], 401);
+        }
+
+        $password = Hash::make($request->newPassword);
+        if(!$this->usuarioRepository->atualizar($usuario->id, ['password' => $password])) {
             return response()->json(["erro" => "Não foi possível alterar senha do usuário!"], 500);
         }
 
