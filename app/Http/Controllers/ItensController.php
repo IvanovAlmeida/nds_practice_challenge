@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Repository\ItemRepository;
+use App\Domain\Exceptions\ValidationException;
+use App\Domain\Interfaces\Services\IItemService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Domain\Interfaces\Repository\IItemRepository;
 
 class ItensController extends Controller
 {
-    private ItemRepository $itemRepository;
+    private IItemService $itemService;
+    private IItemRepository $itemRepository;
 
-    public function __construct(ItemRepository $itemRepository)
+    public function __construct(IItemService $itemService, IItemRepository $itemRepository)
     {
+        $this->itemService = $itemService;
         $this->itemRepository = $itemRepository;
     }
 
@@ -22,7 +27,6 @@ class ItensController extends Controller
      */
     public function buscar(Request $request): JsonResponse
     {
-
         $itens = $this->itemRepository->buscar($request->query->all());
         return response()->json($itens);
     }
@@ -43,21 +47,20 @@ class ItensController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
     public function inserir(Request $request): JsonResponse
     {
-        $validated = Validator::make($request->all(), [
-            'nome' => 'required|min:2|max:25',
-            'valor' => 'required'
-        ]);
-
-        if($validated->fails()) {
-            return response()->json($validated->getMessageBag(), 400);
+        try {
+            $dados = $request->all(['nome', 'valor']);
+            $dados['usuario_id'] = auth()->user()->id;
+            $item = $this->itemService->inserir($dados);
+        } catch ( ValidationException $e ) {
+            return response()->json([
+                'status' => false,
+                'erros' => $e->getErros()
+            ], 400);
         }
-
-        $dados = $request->all(['nome', 'valor']);
-        $dados['usuario_id'] = auth()->user()->id;
-        $item = $this->itemRepository->inserir($dados);
 
         return response()->json($item);
     }
@@ -66,29 +69,27 @@ class ItensController extends Controller
      * @param Request $request
      * @param int $id
      * @return JsonResponse
+     * @throws Exception
      */
     public function editar(Request $request, int $id): JsonResponse
     {
-        $item = $this->itemRepository->buscarPorIdEUsuario($id, auth()->user()->id);
-        if($item == null)
-            return response()->json(["erro" => "not found"], 404);
+        try {
+            $dados = $request->only(['nome', 'valor']);
+            $this->itemService->atualizar($id, auth()->user()->id, $dados);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'erros' => $e->getErros()
+            ], 400);
+        }
 
-        $validated = Validator::make($request->all(), [
-            'nome' => 'required|min:2|max:25',
-            'valor' => 'required'
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'id' => $id,
+                ...$dados
+            ]
         ]);
-
-        if($validated->fails()) {
-            return response()->json($validated->getMessageBag(), 400);
-        }
-
-        $dados = $request->all(['nome', 'valor']);
-        if(!$this->itemRepository->atualizar($id, $dados)) {
-            return response()->json(['Não foi possível alterar o item!'], 500);
-        }
-
-        $item->fill($dados);
-        return response()->json($item);
     }
 
     /**
@@ -97,11 +98,7 @@ class ItensController extends Controller
      */
     public function desativar(int $id): JsonResponse
     {
-        $item = $this->itemRepository->buscarPorIdEUsuario($id, auth()->user()->id);
-        if($item == null)
-            return response()->json(["erro" => "not found"], 404);
-
-        $this->itemRepository->desativar($id);
+        $this->itemService->desativar($id, auth()->user()->id);
         return response()->json(["msg" => "Item desativado com sucesso!"]);
     }
 
@@ -111,11 +108,7 @@ class ItensController extends Controller
      */
     public function reativar(int $id): JsonResponse
     {
-        $item = $this->itemRepository->buscarPorIdEUsuario($id, auth()->user()->id);
-        if($item == null)
-            return response()->json(["erro" => "not found"], 404);
-
-        $this->itemRepository->reativar($id);
+        $this->itemService->reativar($id, auth()->user()->id);
         return response()->json(["msg" => "Item reativado com sucesso!"]);
     }
 }

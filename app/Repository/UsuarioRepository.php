@@ -3,12 +3,11 @@
 
 namespace App\Repository;
 
-
 use App\Models\Usuario;
-use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Collection;
+use App\Domain\Interfaces\Repository\IUsuarioRepository;
 
-class UsuarioRepository
+class UsuarioRepository implements IUsuarioRepository
 {
     public function buscar(array $data): Collection
     {

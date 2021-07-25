@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
-use App\Repository\UsuarioRepository;
+use App\Domain\Exceptions\ValidationException;
+use App\Domain\Interfaces\Repository\IUsuarioRepository;
+use App\Domain\Interfaces\Services\IUsuarioService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Testing\Fluent\Concerns\Has;
-use Illuminate\Validation\Rule;
 
 class UsuariosController extends Controller
 {
-    private UsuarioRepository $usuarioRepository;
+    private IUsuarioService $usuarioService;
+    private IUsuarioRepository $usuarioRepository;
 
-    public function __construct(UsuarioRepository $usuarioRepository)
+    public function __construct(IUsuarioService $usuarioService, IUsuarioRepository $usuarioRepository)
     {
+        $this->usuarioService = $usuarioService;
         $this->usuarioRepository = $usuarioRepository;
     }
 
@@ -35,80 +37,46 @@ class UsuariosController extends Controller
         return response()->json($usuario);
     }
 
-
-
+    /**
+     * @throws Exception
+     */
     public function editar(Request $request): JsonResponse
     {
-        $usuario = $this->usuarioRepository->buscarPorId(auth()->user()->id);
-        if($usuario == null)
-            return response()->json(["erro" => "not found"], 404);
-
-        $validated = Validator::make($request->all(), [
-            'nome' => 'required|min:2|max:80|regex:/^[ ]*(.+[ ]+)+.+[ ]*$/i',
-            'email' => [
-                'required',
-                Rule::unique('usuarios')->ignore($usuario->id)
-            ],
-            'nascimento' => 'required|date'
-        ]);
-
-        if($validated->fails()) {
-            return response()->json($validated->getMessageBag(), 400);
-        }
-
         $dados = $request->only(['nome', 'email', 'nascimento']);
-        if(!$this->usuarioRepository->atualizar($usuario->id, $dados)) {
-            return response()->json(["erro" => "Não foi possível alterar usuário!"], 500);
+
+        try {
+            $this->usuarioService->editar(auth()->user()->id, $dados);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'erros' => $e->getErros()
+            ], 400);
         }
 
-        $usuario->fill($dados);
-        return response()->json($usuario);
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'id' => auth()->user()->id,
+                ...$dados
+            ]
+        ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function alterarSenha(Request $request): JsonResponse
     {
-        $usuario = $this->usuarioRepository->buscarPorId(auth()->user()->id);
-        if($usuario == null)
-            return response()->json(["erro" => "not found"], 404);
-
-        $validated = Validator::make($request->all(), [
-            'password' => 'required',
-            'newPassword' => 'required|min:6'
-        ]);
-
-        if($validated->fails()) {
-            return response()->json($validated->getMessageBag(), 400);
-        }
-
-        if(!Hash::check($request->password, $usuario->password)) {
-            return response()->json(["erro" => "Senha inválida!"], 401);
-        }
-
-        $password = Hash::make($request->newPassword);
-        if(!$this->usuarioRepository->atualizar($usuario->id, ['password' => $password])) {
-            return response()->json(["erro" => "Não foi possível alterar senha do usuário!"], 500);
+        try {
+            $dados = $request->only(['password', 'newPassword']);
+            $this->usuarioService->alterarSenha(auth()->user()->id, $dados);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'erros' => $e->getErros()
+            ], 400);
         }
 
         return response()->json(["msg" => "Senha alterada com sucesso!"]);
-    }
-
-    public function desativar(int $id): JsonResponse
-    {
-        $usuario = $this->usuarioRepository->buscarPorId($id);
-        if($usuario == null)
-            return response()->json(["erro" => "not found"], 404);
-
-        $this->usuarioRepository->desativar($id);
-        return response()->json(["msg" => "Usuário desativado com sucesso!"]);
-    }
-
-    public function reativar(int $id): JsonResponse
-    {
-        $usuario = $this->usuarioRepository->buscarPorId($id);
-        if($usuario == null)
-            return response()->json(["erro" => "not found"], 404);
-
-        $this->usuarioRepository->reativar($id);
-        return response()->json(["msg" => "Usuário reativado com sucesso!"]);
     }
 }
