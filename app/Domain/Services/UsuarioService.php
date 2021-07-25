@@ -84,7 +84,7 @@ class UsuarioService implements IUsuarioService
             throw new ValidationException(["Senha inválida!"]);
         }
 
-        $password = Hash::make($dados['password']);
+        $password = Hash::make($dados['newPassword']);
         if(!$this->usuarioRepository->atualizar($usuario->id, ['password' => $password])) {
             throw new Exception("Não foi possível alterar senha!");
         }

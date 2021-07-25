@@ -83,12 +83,10 @@ class ItensController extends Controller
             ], 400);
         }
 
+        $dados['id'] = $id;
         return response()->json([
             'status' => true,
-            'data' => [
-                'id' => $id,
-                ...$dados
-            ]
+            'data' => $dados
         ]);
     }
 

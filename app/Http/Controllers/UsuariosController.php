@@ -53,12 +53,10 @@ class UsuariosController extends Controller
             ], 400);
         }
 
+        $dados['id'] = auth()->user()->id;
         return response()->json([
             'status' => true,
-            'data' => [
-                'id' => auth()->user()->id,
-                ...$dados
-            ]
+            'data' => $dados
         ]);
     }
 
