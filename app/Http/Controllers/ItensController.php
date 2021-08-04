@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Exceptions\ValidationException;
+use App\Domain\Interfaces\INotificador;
 use App\Domain\Interfaces\Services\IItemService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -15,8 +16,9 @@ class ItensController extends Controller
     private IItemService $itemService;
     private IItemRepository $itemRepository;
 
-    public function __construct(IItemService $itemService, IItemRepository $itemRepository)
+    public function __construct(IItemService $itemService, IItemRepository $itemRepository, INotificador $notificador)
     {
+        parent::__construct($notificador);
         $this->itemService = $itemService;
         $this->itemRepository = $itemRepository;
     }
@@ -28,7 +30,10 @@ class ItensController extends Controller
     public function buscar(Request $request): JsonResponse
     {
         $itens = $this->itemRepository->buscar($request->query->all());
-        return response()->json($itens);
+        return response()->json([
+            'status' => true,
+            'data' => $itens
+        ]);
     }
 
     /**
@@ -41,7 +46,10 @@ class ItensController extends Controller
         if($item == null)
             return response()->json(["erro" => "not found"], 404);
 
-        return response()->json($item);
+        return response()->json([
+            'status' => true,
+            'data' => $item
+        ]);
     }
 
     /**
@@ -51,18 +59,15 @@ class ItensController extends Controller
      */
     public function inserir(Request $request): JsonResponse
     {
-        try {
-            $dados = $request->all(['nome', 'valor']);
-            $dados['usuario_id'] = auth()->user()->id;
-            $item = $this->itemService->inserir($dados);
-        } catch ( ValidationException $e ) {
-            return response()->json([
-                'status' => false,
-                'erros' => $e->getErros()
-            ], 400);
-        }
+        $dados = $request->all(['nome', 'valor']);
+        $dados['usuario_id'] = auth()->user()->id;
 
-        return response()->json($item);
+        $item = $this->itemService->inserir($dados);
+
+        if($this->notificador->temNotificacao())
+            return $this->responseJson(null);
+
+        return $this->responseJson($item, 201);
     }
 
     /**
@@ -73,15 +78,8 @@ class ItensController extends Controller
      */
     public function editar(Request $request, int $id): JsonResponse
     {
-        try {
-            $dados = $request->only(['nome', 'valor']);
-            $this->itemService->atualizar($id, auth()->user()->id, $dados);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => false,
-                'erros' => $e->getErros()
-            ], 400);
-        }
+        $dados = $request->only(['nome', 'valor']);
+        $this->itemService->atualizar($id, auth()->user()->id, $dados);
 
         $dados['id'] = $id;
         return response()->json([

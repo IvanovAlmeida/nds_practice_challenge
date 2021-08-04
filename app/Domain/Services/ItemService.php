@@ -5,8 +5,10 @@ namespace App\Domain\Services;
 
 
 use App\Domain\Exceptions\ValidationException;
+use App\Domain\Interfaces\INotificador;
 use App\Domain\Interfaces\Repository\IItemRepository;
 use App\Domain\Interfaces\Services\IItemService;
+use App\Domain\Notificacao\Notificacao;
 use App\Models\Item;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -15,16 +17,18 @@ use Illuminate\Support\Facades\Validator;
 class ItemService implements IItemService
 {
     private IItemRepository $itemRepository;
+    private INotificador $notificador;
 
-    public function __construct(IItemRepository $itemRepository)
+    public function __construct(IItemRepository $itemRepository, INotificador $notificador)
     {
         $this->itemRepository = $itemRepository;
+        $this->notificador = $notificador;
     }
 
     /**
      * @inheritDoc
      */
-    function inserir(array $dados): Item
+    function inserir(array $dados): ?Item
     {
         $validated = Validator::make($dados, [
             'nome' => 'required|min:2|max:25',
@@ -33,7 +37,13 @@ class ItemService implements IItemService
         ]);
 
         if($validated->fails()) {
-            throw new ValidationException($validated->getMessageBag()->getMessages());
+            foreach ($validated->getMessageBag()->getMessages() as $messages) {
+                foreach ($messages as $item) {
+                    $this->notificador->notificar(new Notificacao($item));
+                }
+            }
+
+            return null;
         }
 
         return $this->itemRepository->inserir($dados);

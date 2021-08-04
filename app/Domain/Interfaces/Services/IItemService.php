@@ -17,11 +17,11 @@ interface IItemService
 {
     /**
      * @param array $dados
+     * @return Item|null
      * @throws ValidationException
      * @throws Exception
-     * @return Item
      */
-    function inserir(array $dados): Item;
+    function inserir(array $dados): ?Item;
 
     /**
      * @param int $id

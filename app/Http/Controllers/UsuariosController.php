@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Exceptions\ValidationException;
+use App\Domain\Interfaces\INotificador;
 use App\Domain\Interfaces\Repository\IUsuarioRepository;
 use App\Domain\Interfaces\Services\IUsuarioService;
 use Exception;
@@ -16,8 +17,9 @@ class UsuariosController extends Controller
     private IUsuarioService $usuarioService;
     private IUsuarioRepository $usuarioRepository;
 
-    public function __construct(IUsuarioService $usuarioService, IUsuarioRepository $usuarioRepository)
+    public function __construct(IUsuarioService $usuarioService, IUsuarioRepository $usuarioRepository, INotificador $notificador)
     {
+        parent::__construct($notificador);
         $this->usuarioService = $usuarioService;
         $this->usuarioRepository = $usuarioRepository;
     }
